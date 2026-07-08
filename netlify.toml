@@ -5,6 +5,9 @@
 #   AUTH_SECRET  — long random string for JWT signing (e.g. `openssl rand -hex 32`)
 #   UPLOAD_DIR   — /tmp/uploads (Lambda's only writable path; see README about
 #                  swapping to Supabase Storage/S3 for durable uploads)
+#   YOCO_SECRET_KEY     — Yoco Portal → Sell online → Payment Gateway (sk_live_…)
+#   YOCO_WEBHOOK_SECRET — whsec_… returned when registering the webhook (README)
+#   APP_URL             — public site origin, e.g. https://khulagrow.smartpick.co.za
 
 [build]
   command = "npx prisma migrate deploy && npm run build"

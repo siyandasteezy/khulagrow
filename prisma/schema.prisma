@@ -29,9 +29,29 @@ model User {
   name         String
   phone        String?
   createdAt    DateTime     @default(now())
+  // Billing: 3-day trial starts at registration; each Yoco payment
+  // extends subscriptionEndsAt by one month.
+  trialEndsAt        DateTime?
+  subscriptionEndsAt DateTime?
   memberships  FarmMember[]
   tasks        TaskItem[]   @relation("assignee")
   auditLogs    AuditLog[]
+  payments     Payment[]
+}
+
+model Payment {
+  id             String    @id @default(cuid())
+  userId         String
+  yocoCheckoutId String    @unique
+  amountCents    Int
+  currency       String    @default("ZAR")
+  status         String    @default("PENDING") // PENDING, PAID, FAILED
+  periodStart    DateTime?
+  periodEnd      DateTime?
+  createdAt      DateTime  @default(now())
+  paidAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model FarmMember {

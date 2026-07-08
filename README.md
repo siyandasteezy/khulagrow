@@ -35,6 +35,40 @@ npm run dev                            # http://localhost:3000
 - `AUTH_SECRET` — JWT signing secret (generate a long random value for production)
 - `UPLOAD_DIR` — where photo/document uploads land (default `./uploads`)
 
+## Payments (Yoco) — R1,500/month with a 3-day trial
+
+Every new account gets a **3-day free trial**. After that, a **R1,500/month**
+subscription (paid by the farm owner) covers the whole team — workers,
+supervisors and inspectors on the owner's farms don't pay. When both trial and
+subscription lapse, records stay **readable** (compliance data is never locked
+away) but new data capture is paused (API returns 402) and the app routes to
+the billing page.
+
+> Yoco's public API supports hosted one-time checkouts, not auto-recurring
+> debits — so renewal is a one-tap manual payment from **More → Billing**,
+> with an in-app trial/expiry reminder. Each payment adds a month on top of
+> whatever time remains.
+
+Setup:
+
+1. Get API keys at the [Yoco Portal](https://portal.yoco.co.za) → *Sell online → Payment Gateway*. Use `sk_test_…` while testing, `sk_live_…` in production → `YOCO_SECRET_KEY`.
+2. Register the webhook (once per environment):
+
+   ```bash
+   curl https://payments.yoco.com/api/webhooks \
+     -H "Authorization: Bearer $YOCO_SECRET_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"khulagrow","url":"https://YOUR-DOMAIN/api/billing/webhook"}'
+   ```
+
+   The response contains a `secret` (`whsec_…`) → `YOCO_WEBHOOK_SECRET`.
+3. Set `APP_URL` to the public site origin (used for the Yoco success/cancel redirects).
+
+The webhook activates the month on `payment.succeeded`; the billing page also
+verifies directly with Yoco when the user returns, so activation works even
+before the webhook lands (and in local dev, where Yoco can't reach you —
+test cards: use Yoco's test card `4111 1111 1111 1111`, any future expiry/CVV).
+
 ## Deploying to Netlify + Neon
 
 1. **Neon** — create a project at [neon.tech](https://neon.tech). From the dashboard copy both connection strings:
@@ -45,6 +79,7 @@ npm run dev                            # http://localhost:3000
    - `DATABASE_URL`, `DIRECT_URL` — from Neon (keep `?sslmode=require`)
    - `AUTH_SECRET` — `openssl rand -hex 32`
    - `UPLOAD_DIR` — `/tmp/uploads`
+   - `YOCO_SECRET_KEY`, `YOCO_WEBHOOK_SECRET`, `APP_URL` — see the Payments section
 4. Deploy. Migrations run automatically on every build; to load demo data run `npx prisma db seed` locally with `DATABASE_URL`/`DIRECT_URL` pointed at Neon.
 
 > **Uploads on Netlify are ephemeral** — Lambda's `/tmp` is wiped between invocations, so photos/documents won't persist. Fine for evaluating; for production swap the write in `src/app/api/upload/route.ts` (and the read in `src/app/api/files/[name]/route.ts`) to Supabase Storage or S3 — it's the single designed swap point.

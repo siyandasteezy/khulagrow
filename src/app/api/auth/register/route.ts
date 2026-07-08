@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSession, handler } from "@/lib/auth";
+import { trialEnd } from "@/lib/billing";
 import { audit } from "@/lib/audit";
 
 const schema = z.object({
@@ -32,6 +33,7 @@ export const POST = handler(async (req: Request) => {
       name: body.data.name,
       phone: body.data.phone,
       passwordHash: await hashPassword(body.data.password),
+      trialEndsAt: trialEnd(), // 3-day free trial starts now
     },
   });
 

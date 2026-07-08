@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { getBillingInfo } from "@/lib/billing";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
@@ -7,10 +8,13 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
-  const memberships = await prisma.farmMember.findMany({
-    where: { userId: session.userId },
-    include: { farm: { select: { id: true, name: true } } },
-  });
+  const [memberships, billing] = await Promise.all([
+    prisma.farmMember.findMany({
+      where: { userId: session.userId },
+      include: { farm: { select: { id: true, name: true } } },
+    }),
+    getBillingInfo(session.userId),
+  ]);
   return NextResponse.json({
     user: { id: session.userId, email: session.email, name: session.name },
     memberships: memberships.map((m) => ({
@@ -18,5 +22,6 @@ export async function GET() {
       farmName: m.farm.name,
       role: m.role,
     })),
+    billing,
   });
 }

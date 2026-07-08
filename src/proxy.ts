@@ -12,6 +12,8 @@ export async function proxy(req: NextRequest) {
   if (
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/api/auth") ||
+    // Yoco calls this server-to-server; authenticity is HMAC-verified in the route.
+    pathname === "/api/billing/webhook" ||
     pathname.startsWith("/icons")
   ) {
     return NextResponse.next();

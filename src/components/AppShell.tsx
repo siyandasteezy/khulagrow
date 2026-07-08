@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, type ReactNode } from "react";
 import { FarmProvider, useFarm } from "./FarmContext";
 import { cn } from "./ui";
-import type { ReactNode } from "react";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: "🏠" },
@@ -28,6 +28,7 @@ const SIDEBAR_MANAGE = [
   { href: "/documents", label: "Documents", icon: "📄" },
   { href: "/reports", label: "Reports", icon: "📊" },
   { href: "/audit", label: "Audit trail", icon: "🔍" },
+  { href: "/billing", label: "Billing", icon: "💳" },
 ];
 
 function SidebarLink({ href, label, icon }: { href: string; label: string; icon: string }) {
@@ -102,7 +103,7 @@ function Sidebar() {
 }
 
 function Header() {
-  const { farm, farms, setFarmId, online, pending } = useFarm();
+  const { farm, farms, setFarmId, online, pending, billing } = useFarm();
   const router = useRouter();
 
   return (
@@ -114,6 +115,14 @@ function Header() {
         </div>
         <div className="hidden lg:block" aria-hidden />
         <div className="flex items-center gap-2">
+          {billing?.status === "TRIALING" && (
+            <Link
+              href="/billing"
+              className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800"
+            >
+              Trial · {billing.daysLeft}d left
+            </Link>
+          )}
           {!online && (
             <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
               Offline{pending > 0 ? ` · ${pending} queued` : ""}
@@ -186,6 +195,24 @@ function BottomNav() {
   );
 }
 
+/** Hard-gates the app UI to /billing once trial + subscription have lapsed. */
+function SubscriptionGate({ children }: { children: ReactNode }) {
+  const { billing, loading } = useFarm();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const locked = !loading && billing !== null && !billing.active;
+
+  useEffect(() => {
+    if (locked && !pathname.startsWith("/billing")) {
+      router.replace("/billing");
+    }
+  }, [locked, pathname, router]);
+
+  if (locked && !pathname.startsWith("/billing")) return null;
+  return <>{children}</>;
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <FarmProvider>
@@ -194,7 +221,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="lg:pl-64">
           <Header />
           <main className="mx-auto max-w-3xl px-4 pb-28 pt-4 lg:max-w-4xl lg:pb-10">
-            {children}
+            <SubscriptionGate>{children}</SubscriptionGate>
           </main>
         </div>
         <BottomNav />

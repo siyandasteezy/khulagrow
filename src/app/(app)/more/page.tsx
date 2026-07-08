@@ -13,6 +13,7 @@ const ITEMS = [
   { href: "/documents", icon: "📄", label: "Documents", desc: "Licences, SOPs, certificates" },
   { href: "/reports", icon: "📊", label: "Reports & exports", desc: "PDF and Excel reports" },
   { href: "/audit", icon: "🔍", label: "Audit trail", desc: "Who did what, when" },
+  { href: "/billing", icon: "💳", label: "Billing", desc: "Subscription — R1,500/month" },
 ];
 
 export default function MorePage() {

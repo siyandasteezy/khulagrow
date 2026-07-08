@@ -36,7 +36,12 @@ async function main() {
 
   const password = await bcrypt.hash("demo1234", 10);
   const owner = await prisma.user.create({
-    data: { email: "demo@khulagrow.co.za", name: "Thandi Nkosi", passwordHash: password, phone: "+27 82 000 0000" },
+    data: {
+      email: "demo@khulagrow.co.za", name: "Thandi Nkosi", passwordHash: password,
+      phone: "+27 82 000 0000",
+      // Demo account stays subscribed; team members are covered through the owner.
+      subscriptionEndsAt: daysAhead(365),
+    },
   });
   const worker = await prisma.user.create({
     data: { email: "worker@khulagrow.co.za", name: "Sipho Dlamini", passwordHash: password },

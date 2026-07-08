@@ -119,15 +119,44 @@ export const ALL_ROLES: Role[] = [
   "WORKER",
 ];
 
+const MUTATING = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+// Auth and billing endpoints stay reachable with a lapsed subscription,
+// otherwise nobody could log in or pay.
+const BILLING_EXEMPT = [/^\/api\/auth\//, /^\/api\/billing(\/|$)/];
+
 /**
  * Wraps a route handler so `throw new Response(...)` from the require*
  * helpers becomes the HTTP response instead of a 500.
+ *
+ * Also enforces the subscription: mutations from users whose trial and
+ * subscription have both lapsed get a 402. Reads stay open so licensees
+ * never lose access to their compliance records.
  */
 export function handler<T extends unknown[]>(
   fn: (...args: T) => Promise<Response>
 ): (...args: T) => Promise<Response> {
   return async (...args: T) => {
     try {
+      const req = args[0];
+      if (req instanceof Request && MUTATING.has(req.method)) {
+        const path = new URL(req.url).pathname;
+        if (path.startsWith("/api/") && !BILLING_EXEMPT.some((r) => r.test(path))) {
+          const session = await getSession();
+          if (session) {
+            const { getBillingInfo } = await import("./billing");
+            const billing = await getBillingInfo(session.userId);
+            if (!billing.active) {
+              throw new Response(
+                JSON.stringify({
+                  error: "Your trial has ended — subscribe to keep capturing data",
+                  code: "SUBSCRIPTION_REQUIRED",
+                }),
+                { status: 402, headers: { "Content-Type": "application/json" } }
+              );
+            }
+          }
+        }
+      }
       return await fn(...args);
     } catch (err) {
       if (err instanceof Response) return err;

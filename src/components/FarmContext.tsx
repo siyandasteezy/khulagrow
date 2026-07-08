@@ -18,11 +18,19 @@ export type FarmSummary = {
   licenceExpiry?: string | null;
 };
 
+export type Billing = {
+  status: "TRIALING" | "ACTIVE" | "COVERED" | "EXPIRED";
+  until: string | null;
+  daysLeft: number | null;
+  active: boolean;
+};
+
 type Ctx = {
   farms: FarmSummary[];
   farm: FarmSummary | null;
   setFarmId: (id: string) => void;
   user: { id: string; name: string; email: string } | null;
+  billing: Billing | null;
   loading: boolean;
   refreshFarms: () => Promise<void>;
   online: boolean;
@@ -34,6 +42,7 @@ const FarmContext = createContext<Ctx>({
   farm: null,
   setFarmId: () => {},
   user: null,
+  billing: null,
   loading: true,
   refreshFarms: async () => {},
   online: true,
@@ -48,6 +57,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [farms, setFarms] = useState<FarmSummary[]>([]);
   const [farmId, setFarmIdState] = useState<string | null>(null);
   const [user, setUser] = useState<Ctx["user"]>(null);
+  const [billing, setBilling] = useState<Billing | null>(null);
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(true);
   const [pending, setPending] = useState(0);
@@ -55,10 +65,11 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const refreshFarms = useCallback(async () => {
     try {
       const [me, list] = await Promise.all([
-        apiGet<{ user: Ctx["user"] }>("/api/auth/me"),
+        apiGet<{ user: Ctx["user"]; billing?: Billing }>("/api/auth/me"),
         apiGet<FarmSummary[]>("/api/farms"),
       ]);
       setUser(me.user);
+      setBilling(me.billing ?? null);
       setFarms(list);
       setFarmIdState((cur) => {
         const stored = cur ?? localStorage.getItem("kg_farm");
@@ -108,7 +119,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
 
   return (
     <FarmContext.Provider
-      value={{ farms, farm, setFarmId, user, loading, refreshFarms, online, pending }}
+      value={{ farms, farm, setFarmId, user, billing, loading, refreshFarms, online, pending }}
     >
       {children}
     </FarmContext.Provider>
