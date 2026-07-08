@@ -1,0 +1,483 @@
+generator client {
+  provider = "prisma-client-js"
+  // native = local dev; rhel-openssl-3.0.x = Netlify Functions (AWS Lambda)
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  // Neon: pooled connection string for the app…
+  url      = env("DATABASE_URL")
+  // …and the direct (unpooled) string for migrations.
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Users & Access ──────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  MANAGER
+  SUPERVISOR
+  INSPECTOR
+  WORKER
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String
+  name         String
+  phone        String?
+  createdAt    DateTime     @default(now())
+  memberships  FarmMember[]
+  tasks        TaskItem[]   @relation("assignee")
+  auditLogs    AuditLog[]
+}
+
+model FarmMember {
+  id     String @id @default(cuid())
+  userId String
+  farmId String
+  role   Role
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, farmId])
+}
+
+// ─── Farm Structure ──────────────────────────────────────────────
+
+enum AreaType {
+  BLOCK
+  TUNNEL
+  ROOM
+  GREENHOUSE
+  FIELD
+}
+
+model Farm {
+  id            String    @id @default(cuid())
+  name          String
+  licenceNumber String? // SAHPRA licence number
+  licenceExpiry DateTime?
+  address       String?
+  latitude      Float?
+  longitude     Float?
+  boundary      Json? // GeoJSON polygon of farm boundary
+  sizeHectares  Float?
+  createdAt     DateTime  @default(now())
+
+  members     FarmMember[]
+  areas       Area[]
+  batches     Batch[]
+  inputLogs   InputLog[]
+  dailyLogs   DailyLog[]
+  tasks       TaskItem[]
+  inspections Inspection[]
+  compliance  ComplianceRecord[]
+  wasteLogs   WasteLog[]
+  harvests    Harvest[]
+  inventory   InventoryLot[]
+  documents   Document[]
+  auditLogs   AuditLog[]
+}
+
+model Area {
+  id       String   @id @default(cuid())
+  farmId   String
+  name     String
+  type     AreaType
+  widthM   Float?
+  lengthM  Float?
+  capacity Int? // max plant capacity
+
+  farm     Farm                 @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  beds     Bed[]
+  batches  Batch[]
+  readings EnvironmentReading[]
+}
+
+model Bed {
+  id      String @id @default(cuid())
+  areaId  String
+  name    String
+  widthM  Float?
+  lengthM Float?
+  area    Area   @relation(fields: [areaId], references: [id], onDelete: Cascade)
+}
+
+// ─── Genetics & Plants ───────────────────────────────────────────
+
+enum StrainType {
+  INDICA
+  SATIVA
+  HYBRID
+}
+
+model Strain {
+  id            String     @id @default(cuid())
+  name          String     @unique
+  type          StrainType @default(HYBRID)
+  genetics      String? // parent lineage
+  floweringDays Int?
+  thcPercent    Float?
+  cbdPercent    Float?
+  notes         String?
+  batches       Batch[]
+}
+
+enum PlantSource {
+  SEED
+  CLONE
+}
+
+enum GrowthStage {
+  GERMINATION
+  CLONE
+  SEEDLING
+  VEGETATIVE
+  FLOWERING
+  HARVESTED
+  DESTROYED
+}
+
+enum HealthStatus {
+  HEALTHY
+  NEEDS_ATTENTION
+  PEST
+  DISEASE
+  NUTRIENT_DEFICIENCY
+  QUARANTINE
+  DEAD
+}
+
+model Batch {
+  id         String       @id @default(cuid())
+  farmId     String
+  code       String       @unique // e.g. KG-2026-001
+  strainId   String
+  source     PlantSource
+  stage      GrowthStage  @default(GERMINATION)
+  health     HealthStatus @default(HEALTHY)
+  plantCount Int
+  areaId     String?
+  startDate  DateTime     @default(now())
+  notes      String?
+
+  farm      Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  strain    Strain       @relation(fields: [strainId], references: [id])
+  area      Area?        @relation(fields: [areaId], references: [id])
+  plants    Plant[]
+  events    PlantEvent[]
+  inputLogs InputLog[]
+  wasteLogs WasteLog[]
+  harvests  Harvest[]
+  tasks     TaskItem[]
+}
+
+model Plant {
+  id     String       @id @default(cuid())
+  batchId String
+  tag    String       @unique // unique plant tag, e.g. KG-2026-001-P001
+  stage  GrowthStage  @default(GERMINATION)
+  health HealthStatus @default(HEALTHY)
+  notes  String?
+
+  batch     Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  events    PlantEvent[]
+  wasteLogs WasteLog[]
+}
+
+enum EventType {
+  STAGE_CHANGE
+  HEALTH_CHECK
+  MOVE
+  NOTE
+  PHOTO
+}
+
+model PlantEvent {
+  id       String        @id @default(cuid())
+  batchId  String?
+  plantId  String?
+  type     EventType
+  stage    GrowthStage?
+  health   HealthStatus?
+  note     String?
+  photoUrl String?
+  byUserId String?
+  at       DateTime      @default(now())
+
+  batch Batch? @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  plant Plant? @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@index([batchId, at])
+}
+
+// ─── Inputs, Environment & Daily Logs ────────────────────────────
+
+enum InputType {
+  IRRIGATION
+  NUTRIENT
+  FERTILIZER
+  PESTICIDE
+  FUNGICIDE
+  GROWING_MEDIA
+  LABOUR
+  EQUIPMENT
+  OTHER
+}
+
+model InputLog {
+  id         String    @id @default(cuid())
+  farmId     String
+  batchId    String?
+  type       InputType
+  product    String? // product/brand name
+  quantity   Float?
+  unit       String? // L, kg, g, hours
+  costRands  Float? // cost in ZAR
+  laborHours Float?
+  notes      String?
+  byUserId   String?
+  at         DateTime  @default(now())
+
+  farm  Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  batch Batch? @relation(fields: [batchId], references: [id])
+
+  @@index([farmId, at])
+}
+
+model EnvironmentReading {
+  id       String   @id @default(cuid())
+  areaId   String
+  tempC    Float?
+  humidity Float?
+  ph       Float?
+  ec       Float?
+  co2Ppm   Float?
+  at       DateTime @default(now())
+
+  area Area @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  @@index([areaId, at])
+}
+
+model DailyLog {
+  id       String   @id @default(cuid())
+  farmId   String
+  date     DateTime @default(now())
+  weather  String?
+  notes    String
+  byUserId String?
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+// ─── Tasks ───────────────────────────────────────────────────────
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model TaskItem {
+  id          String       @id @default(cuid())
+  farmId      String
+  title       String
+  description String?
+  status      TaskStatus   @default(PENDING)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  assigneeId  String?
+  batchId     String?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+
+  farm     Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  assignee User?  @relation("assignee", fields: [assigneeId], references: [id])
+  batch    Batch? @relation(fields: [batchId], references: [id])
+}
+
+// ─── Compliance (SAHPRA) ─────────────────────────────────────────
+
+model Inspection {
+  id               String   @id @default(cuid())
+  farmId           String
+  type             String // internal, SAHPRA, security, quality
+  inspectorName    String
+  date             DateTime @default(now())
+  passed           Boolean  @default(true)
+  findings         String?
+  correctiveAction String?
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  ACTION_REQUIRED
+  OVERDUE
+}
+
+model ComplianceRecord {
+  id          String           @id @default(cuid())
+  farmId      String
+  requirement String // e.g. "Monthly cultivation report to SAHPRA"
+  status      ComplianceStatus @default(ACTION_REQUIRED)
+  dueDate     DateTime?
+  completedAt DateTime?
+  notes       String?
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+enum WasteReason {
+  DISEASED
+  PEST_INFESTED
+  MALE_PLANT
+  HERMAPHRODITE
+  FAILED_QC
+  DAMAGED
+  EXPIRED
+  OTHER
+}
+
+model WasteLog {
+  id          String      @id @default(cuid())
+  farmId      String
+  batchId     String?
+  plantId     String?
+  reason      WasteReason
+  weightGrams Float?
+  plantCount  Int?
+  method      String // destruction method, e.g. shredding + composting
+  witnessName String // SAHPRA requires witnessed destruction
+  notes       String?
+  byUserId    String?
+  at          DateTime    @default(now())
+
+  farm  Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  batch Batch? @relation(fields: [batchId], references: [id])
+  plant Plant? @relation(fields: [plantId], references: [id])
+}
+
+// ─── Harvest & Inventory ─────────────────────────────────────────
+
+model Harvest {
+  id          String   @id @default(cuid())
+  farmId      String
+  batchId     String
+  date        DateTime @default(now())
+  plantCount  Int
+  wetWeightG  Float
+  dryWeightG  Float?
+  notes       String?
+  byUserId    String?
+
+  farm  Farm           @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  batch Batch          @relation(fields: [batchId], references: [id])
+  lots  InventoryLot[]
+}
+
+enum ProductType {
+  FLOWER
+  TRIM
+  BIOMASS
+  EXTRACT
+  SEEDS
+  CLONES
+}
+
+enum LotStatus {
+  DRYING
+  CURING
+  IN_STORAGE
+  PROCESSING
+  PACKAGED
+  SHIPPED
+  DESTROYED
+}
+
+model InventoryLot {
+  id              String      @id @default(cuid())
+  farmId          String
+  harvestId       String?
+  code            String      @unique // lot code for traceability
+  product         ProductType @default(FLOWER)
+  weightGrams     Float
+  status          LotStatus   @default(DRYING)
+  storageLocation String?
+  packagedUnits   Int?
+  notes           String?
+  createdAt       DateTime    @default(now())
+
+  farm       Farm               @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  harvest    Harvest?           @relation(fields: [harvestId], references: [id])
+  processing ProcessingRecord[]
+}
+
+model ProcessingRecord {
+  id           String    @id @default(cuid())
+  lotId        String
+  type         String // drying, curing, trimming, extraction, packaging
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  inputWeightG Float?
+  outputWeightG Float?
+  notes        String?
+  byUserId     String?
+
+  lot InventoryLot @relation(fields: [lotId], references: [id], onDelete: Cascade)
+}
+
+// ─── Documents & Audit ───────────────────────────────────────────
+
+enum DocType {
+  LICENCE
+  SOP
+  CERTIFICATE
+  PERMIT
+  LAB_RESULT
+  INSURANCE
+  OTHER
+}
+
+model Document {
+  id           String    @id @default(cuid())
+  farmId       String
+  type         DocType
+  title        String
+  fileUrl      String?
+  expiryDate   DateTime?
+  notes        String?
+  uploadedById String?
+  createdAt    DateTime  @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  userId   String?
+  farmId   String?
+  action   String // CREATE, UPDATE, DELETE, LOGIN
+  entity   String // model name
+  entityId String?
+  detail   Json?
+  at       DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+  farm Farm? @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([farmId, at])
+}

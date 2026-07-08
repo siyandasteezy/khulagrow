@@ -1,0 +1,16 @@
+# KhulaGrow — Netlify deployment
+# Required environment variables (Site settings → Environment variables):
+#   DATABASE_URL — Neon *pooled* connection string (…-pooler.…neon.tech/…?sslmode=require)
+#   DIRECT_URL   — Neon *direct* connection string (used by prisma migrate deploy)
+#   AUTH_SECRET  — long random string for JWT signing (e.g. `openssl rand -hex 32`)
+#   UPLOAD_DIR   — /tmp/uploads (Lambda's only writable path; see README about
+#                  swapping to Supabase Storage/S3 for durable uploads)
+
+[build]
+  command = "npx prisma migrate deploy && npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

@@ -1,0 +1,24 @@
+{
+  "name": "KhulaGrow — Cannabis Cultivation Management",
+  "short_name": "KhulaGrow",
+  "description": "Seed-to-harvest traceability and SAHPRA compliance for licensed cultivators",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f6f7f4",
+  "theme_color": "#215c24",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
