@@ -4,12 +4,22 @@ import { jwtVerify } from "jose";
 const SECRET = new TextEncoder().encode(
   process.env.AUTH_SECRET ?? "dev-secret"
 );
-const PUBLIC_PATHS = ["/login", "/register", "/manifest.json", "/sw.js"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/manifest.json",
+  "/sw.js",
+  // SEO surfaces — crawlers don't hold sessions.
+  "/robots.txt",
+  "/sitemap.xml",
+  "/opengraph-image",
+];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
+    pathname === "/" || // public marketing page
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/api/auth") ||
     // Yoco calls this server-to-server; authenticity is HMAC-verified in the route.

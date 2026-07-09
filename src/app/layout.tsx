@@ -8,16 +8,24 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.APP_URL ?? "https://khulagrow.smartpick.co.za";
+
 export const metadata: Metadata = {
-  title: "KhulaGrow — Cannabis Cultivation Management",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "KhulaGrow — Cannabis Cultivation Management",
+    template: "%s · KhulaGrow",
+  },
   description:
     "Seed-to-harvest traceability, SAHPRA compliance and farm management for licensed cannabis cultivators.",
+  applicationName: "KhulaGrow",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "KhulaGrow",
   },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
