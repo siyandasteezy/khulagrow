@@ -136,7 +136,13 @@ function JsonLd() {
 
 function LeafTexture({ id, className }: { id: string; className?: string }) {
   return (
-    <svg className={className} aria-hidden width="100%" height="100%" style={{ opacity: 0.05 }}>
+    <svg
+      className={className}
+      aria-hidden
+      width="100%"
+      height="100%"
+      style={{ opacity: 0.05, pointerEvents: "none" }}
+    >
       <defs>
         <pattern id={id} width="140" height="140" patternUnits="userSpaceOnUse" patternTransform="rotate(18)">
           <path
