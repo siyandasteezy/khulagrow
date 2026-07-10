@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* inline: the utility must inline var(--font-fraunces), which next/font sets on <body> */
+@theme inline {
+  --font-display: var(--font-fraunces), Georgia, serif;
+}
+
 @theme {
   --color-brand-50: #f0f7f0;
   --color-brand-100: #dcefdc;
