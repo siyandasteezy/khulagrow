@@ -13,6 +13,9 @@ const PUBLIC_PATHS = [
   "/robots.txt",
   "/sitemap.xml",
   "/opengraph-image",
+  // Generated favicon routes (also covers /icons/* and /apple-icon).
+  "/icon",
+  "/apple-icon",
 ];
 
 export async function proxy(req: NextRequest) {
