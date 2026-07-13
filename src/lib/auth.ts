@@ -87,7 +87,14 @@ export async function getFarmRole(
   const member = await prisma.farmMember.findUnique({
     where: { userId_farmId: { userId, farmId } },
   });
-  return member?.role ?? null;
+  if (member) return member.role;
+  // Platform admins get owner-level access to every farm so they can
+  // support clients; their actions are audited under their own user.
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isAdmin: true },
+  });
+  return user?.isAdmin ? "OWNER" : null;
 }
 
 /** Throws Response(403) unless the user holds one of `roles` on the farm. */

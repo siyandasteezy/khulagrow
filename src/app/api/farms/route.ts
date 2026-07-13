@@ -6,8 +6,13 @@ import { audit } from "@/lib/audit";
 
 export const GET = handler(async () => {
   const session = await requireSession();
+  const me = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { isAdmin: true },
+  });
   const farms = await prisma.farm.findMany({
-    where: { members: { some: { userId: session.userId } } },
+    // Platform admins see every farm (support access).
+    where: me?.isAdmin ? {} : { members: { some: { userId: session.userId } } },
     include: {
       members: { where: { userId: session.userId }, select: { role: true } },
       _count: { select: { batches: true, areas: true, tasks: true } },
@@ -24,7 +29,7 @@ export const GET = handler(async () => {
       latitude: f.latitude,
       longitude: f.longitude,
       sizeHectares: f.sizeHectares,
-      role: f.members[0]?.role,
+      role: f.members[0]?.role ?? (me?.isAdmin ? "OWNER" : undefined),
       counts: f._count,
     }))
   );
