@@ -174,8 +174,8 @@ export default function HelpPage() {
         <p className="font-semibold text-gray-900">🤝 Stuck? We&apos;ll help</p>
         <p className="mt-1 text-sm text-gray-500">
           Email{" "}
-          <a href="mailto:siyanda@smartpick.co.za" className="font-medium text-brand-700 hover:underline">
-            siyanda@smartpick.co.za
+          <a href="mailto:support@smartpick.co.za" className="font-medium text-brand-700 hover:underline">
+            support@smartpick.co.za
           </a>{" "}
           and we&apos;ll get you unstuck — support can securely look at your farm with you when
           you need hands-on help.
