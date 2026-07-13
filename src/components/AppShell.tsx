@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { FarmProvider, useFarm } from "./FarmContext";
+import { Onboarding } from "./Onboarding";
 import { cn } from "./ui";
 
 const NAV = [
@@ -29,6 +30,7 @@ const SIDEBAR_MANAGE = [
   { href: "/reports", label: "Reports", icon: "📊" },
   { href: "/audit", label: "Audit trail", icon: "🔍" },
   { href: "/billing", label: "Billing", icon: "💳" },
+  { href: "/help", label: "How it works", icon: "❓" },
 ];
 
 function SidebarLink({ href, label, icon }: { href: string; label: string; icon: string }) {
@@ -231,6 +233,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Header />
           <main className="mx-auto max-w-3xl px-4 pb-28 pt-4 lg:max-w-4xl lg:pb-10">
             <SubscriptionGate>{children}</SubscriptionGate>
+            <Onboarding />
           </main>
         </div>
         <BottomNav />

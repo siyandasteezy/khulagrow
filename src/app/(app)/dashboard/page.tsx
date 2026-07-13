@@ -51,11 +51,27 @@ export default function DashboardPage() {
   if (farmLoading) return <Spinner />;
   if (!farm) {
     return (
-      <EmptyState
-        icon="🚜"
-        title="Welcome to KhulaGrow"
-        hint="Add your first farm to start tracking cultivation"
-      />
+      <div>
+        <EmptyState
+          icon="🚜"
+          title="Welcome to KhulaGrow"
+          hint="Add your first farm to start tracking cultivation"
+        />
+        <div className="mx-auto flex max-w-xs flex-col gap-2">
+          <Link
+            href="/farms/new"
+            className="rounded-xl bg-brand-700 px-6 py-3.5 text-center font-bold text-white active:bg-brand-800"
+          >
+            + Add your farm
+          </Link>
+          <Link
+            href="/help"
+            className="rounded-xl border border-gray-200 bg-white px-6 py-3.5 text-center font-semibold text-gray-700 active:bg-gray-50"
+          >
+            See how KhulaGrow works
+          </Link>
+        </div>
+      </div>
     );
   }
   if (loading || !data) return <Spinner />;
