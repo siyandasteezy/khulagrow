@@ -19,7 +19,7 @@ export type FarmSummary = {
 };
 
 export type Billing = {
-  status: "TRIALING" | "ACTIVE" | "COVERED" | "EXPIRED";
+  status: "TRIALING" | "ACTIVE" | "COVERED" | "EXPIRED" | "STAFF";
   until: string | null;
   daysLeft: number | null;
   active: boolean;
