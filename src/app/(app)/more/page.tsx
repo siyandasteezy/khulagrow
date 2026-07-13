@@ -30,6 +30,18 @@ export default function MorePage() {
     <div>
       <PageHeader title="More" subtitle={user ? `Signed in as ${user.name}` : undefined} />
       <div className="space-y-2.5">
+        {user?.isAdmin && (
+          <Link href="/admin" className="block">
+            <Card className="flex items-center gap-3.5 border border-brand-200 p-3.5 active:scale-[0.99] transition-transform">
+              <span className="text-2xl">🛠️</span>
+              <div className="flex-1">
+                <p className="font-semibold text-gray-900">Admin</p>
+                <p className="text-xs text-gray-400">Registrations, billing status, contacts</p>
+              </div>
+              <span className="text-gray-300">›</span>
+            </Card>
+          </Link>
+        )}
         {ITEMS.map((item) => (
           <Link key={item.href} href={item.href} className="block">
             <Card className="flex items-center gap-3.5 p-3.5 active:scale-[0.99] transition-transform">

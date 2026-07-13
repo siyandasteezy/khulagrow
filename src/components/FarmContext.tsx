@@ -29,7 +29,7 @@ type Ctx = {
   farms: FarmSummary[];
   farm: FarmSummary | null;
   setFarmId: (id: string) => void;
-  user: { id: string; name: string; email: string } | null;
+  user: { id: string; name: string; email: string; isAdmin?: boolean } | null;
   billing: Billing | null;
   loading: boolean;
   refreshFarms: () => Promise<void>;

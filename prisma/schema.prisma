@@ -28,6 +28,8 @@ model User {
   passwordHash String
   name         String
   phone        String?
+  // Platform admin: sees /admin (all registrations, billing status).
+  isAdmin      Boolean      @default(false)
   createdAt    DateTime     @default(now())
   // Billing: 3-day trial starts at registration; each Yoco payment
   // extends subscriptionEndsAt by one month.

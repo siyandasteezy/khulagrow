@@ -8,15 +8,24 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
-  const [memberships, billing] = await Promise.all([
+  const [memberships, billing, me] = await Promise.all([
     prisma.farmMember.findMany({
       where: { userId: session.userId },
       include: { farm: { select: { id: true, name: true } } },
     }),
     getBillingInfo(session.userId),
+    prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { isAdmin: true },
+    }),
   ]);
   return NextResponse.json({
-    user: { id: session.userId, email: session.email, name: session.name },
+    user: {
+      id: session.userId,
+      email: session.email,
+      name: session.name,
+      isAdmin: me?.isAdmin ?? false,
+    },
     memberships: memberships.map((m) => ({
       farmId: m.farmId,
       farmName: m.farm.name,
