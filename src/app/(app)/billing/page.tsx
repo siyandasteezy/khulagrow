@@ -16,6 +16,7 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   ACTIVE: { label: "Active", cls: "bg-green-100 text-green-800" },
   COVERED: { label: "Covered by farm owner", cls: "bg-blue-100 text-blue-800" },
   EXPIRED: { label: "Expired", cls: "bg-red-100 text-red-800" },
+  STAFF: { label: "Platform admin", cls: "bg-gray-100 text-gray-700" },
 };
 
 function BillingInner() {
@@ -154,6 +155,9 @@ function BillingInner() {
               this account.
             </p>
           )}
+          {billing.status === "STAFF" && (
+            <p>This is a platform admin account — full access, nothing to pay.</p>
+          )}
           {billing.status === "EXPIRED" && (
             <p className="text-red-700">
               Your trial and subscription have ended. Your records are safe and readable, but
@@ -162,7 +166,7 @@ function BillingInner() {
           )}
         </div>
 
-        {billing.status !== "COVERED" && (
+        {billing.status !== "COVERED" && billing.status !== "STAFF" && (
           <Button size="lg" className="mt-4" onClick={subscribe} disabled={busy || verifying}>
             {busy
               ? "Opening secure checkout…"
@@ -171,10 +175,12 @@ function BillingInner() {
                 : "Subscribe — R1,500/month"}
           </Button>
         )}
-        <p className="mt-2 text-center text-xs text-gray-400">
-          Secure card payment via Yoco. Renewals are manual — we remind you in the app before
-          your month ends; no surprise debits.
-        </p>
+        {billing.status !== "COVERED" && billing.status !== "STAFF" && (
+          <p className="mt-2 text-center text-xs text-gray-400">
+            Secure card payment via Yoco. Renewals are manual — we remind you in the app before
+            your month ends; no surprise debits.
+          </p>
+        )}
       </Card>
 
       {payments.length > 0 && (

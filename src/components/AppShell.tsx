@@ -84,6 +84,15 @@ function Sidebar() {
         {SIDEBAR_MANAGE.map((item) => (
           <SidebarLink key={item.href} {...item} />
         ))}
+
+        {user?.isAdmin && (
+          <>
+            <p className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+              Platform
+            </p>
+            <SidebarLink href="/admin" label="Admin" icon="🛠️" />
+          </>
+        )}
       </nav>
 
       <div className="border-t border-gray-100 p-3">

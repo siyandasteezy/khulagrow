@@ -18,6 +18,7 @@ function ownStatus(u: Own, now: Date) {
 }
 
 const STATUS_STYLE: Record<string, string> = {
+  STAFF: "bg-gray-100 text-gray-600",
   ACTIVE: "bg-brand-100 text-brand-800",
   TRIALING: "bg-amber-100 text-amber-800",
   COVERED: "bg-sky-100 text-sky-800",
@@ -71,7 +72,7 @@ export default async function AdminPage() {
       u.memberships.some((m) =>
         m.farm.members.some((o) => ownStatus(o.user, now))
       );
-    const status = own?.status ?? (covered ? "COVERED" : "EXPIRED");
+    const status = u.isAdmin ? "STAFF" : own?.status ?? (covered ? "COVERED" : "EXPIRED");
     const paidCents = u.payments.reduce((s, p) => s + p.amountCents, 0);
     return {
       ...u,

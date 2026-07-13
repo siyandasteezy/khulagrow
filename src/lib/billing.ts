@@ -16,7 +16,7 @@ export const TRIAL_DAYS = 3;
 
 const YOCO_API = "https://payments.yoco.com/api";
 
-export type BillingStatus = "TRIALING" | "ACTIVE" | "COVERED" | "EXPIRED";
+export type BillingStatus = "TRIALING" | "ACTIVE" | "COVERED" | "EXPIRED" | "STAFF";
 
 export type BillingInfo = {
   status: BillingStatus;
@@ -44,9 +44,12 @@ export async function getBillingInfo(userId: string): Promise<BillingInfo> {
   const now = new Date();
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { trialEndsAt: true, subscriptionEndsAt: true },
+    select: { trialEndsAt: true, subscriptionEndsAt: true, isAdmin: true },
   });
   if (!user) return { status: "EXPIRED", until: null, daysLeft: null, active: false };
+
+  // Platform admins are never billed.
+  if (user.isAdmin) return { status: "STAFF", until: null, daysLeft: null, active: true };
 
   const own = ownStatus(user, now);
   if (own) {
