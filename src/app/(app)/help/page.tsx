@@ -56,6 +56,17 @@ const STEPS = [
     ],
   },
   {
+    icon: "📡",
+    title: "Optional: let sensors do the tedious logging",
+    intro: "Temperature, humidity, pH, EC and CO₂ can record themselves.",
+    how: [
+      "On your farm page, open Sensors → + Add sensor: name it, pick what it measures and which tunnel or room it sits in.",
+      "You'll get an API key and endpoint — point the device (or whoever set it up) at them, and readings flow in automatically.",
+      "Each sensor card shows whether it's online and its latest reading; tap it to copy or rotate the key, pause it, or move it.",
+      "Manual readings via Quick log still work exactly the same — sensors just take the drudgery away.",
+    ],
+  },
+  {
     icon: "✅",
     title: "6. Run the week with tasks",
     intro: "Assign work with due dates so nothing slips.",

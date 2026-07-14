@@ -27,6 +27,8 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/api/auth") ||
     // Yoco calls this server-to-server; authenticity is HMAC-verified in the route.
     pathname === "/api/billing/webhook" ||
+    // Hardware sensors push readings here; authenticated by API key in the route.
+    pathname === "/api/ingest" ||
     pathname.startsWith("/icons")
   ) {
     return NextResponse.next();

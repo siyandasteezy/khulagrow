@@ -102,6 +102,7 @@ model Farm {
   inventory   InventoryLot[]
   documents   Document[]
   auditLogs   AuditLog[]
+  sensors     Sensor[]
 }
 
 model Area {
@@ -117,6 +118,7 @@ model Area {
   beds     Bed[]
   batches  Batch[]
   readings EnvironmentReading[]
+  sensors  Sensor[]
 }
 
 model Bed {
@@ -270,9 +272,43 @@ model InputLog {
   @@index([farmId, at])
 }
 
+// ─── Sensors ─────────────────────────────────────────────────────
+
+enum SensorType {
+  TEMP_HUMIDITY
+  TEMPERATURE
+  HUMIDITY
+  PH
+  EC
+  CO2
+  OTHER
+}
+
+// A physical device in an area that pushes EnvironmentReadings via
+// the public /api/ingest endpoint, authenticated by its apiKey.
+model Sensor {
+  id         String     @id @default(cuid())
+  farmId     String
+  areaId     String
+  name       String
+  type       SensorType
+  apiKey     String     @unique
+  active     Boolean    @default(true)
+  lastSeenAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  farm     Farm                 @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  area     Area                 @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  readings EnvironmentReading[]
+
+  @@index([farmId])
+}
+
 model EnvironmentReading {
   id       String   @id @default(cuid())
   areaId   String
+  // Set when the reading came from a sensor; null = manual entry.
+  sensorId String?
   tempC    Float?
   humidity Float?
   ph       Float?
@@ -280,9 +316,11 @@ model EnvironmentReading {
   co2Ppm   Float?
   at       DateTime @default(now())
 
-  area Area @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  area   Area    @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  sensor Sensor? @relation(fields: [sensorId], references: [id], onDelete: SetNull)
 
   @@index([areaId, at])
+  @@index([sensorId, at])
 }
 
 model DailyLog {

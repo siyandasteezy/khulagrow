@@ -135,3 +135,13 @@ export function fmtRands(r: number | null | undefined): string {
   if (r == null) return "—";
   return `R ${r.toLocaleString("en-ZA", { maximumFractionDigits: 2 })}`;
 }
+
+export const SENSOR_TYPE_LABELS: Record<string, string> = {
+  TEMP_HUMIDITY: "Temp + humidity",
+  TEMPERATURE: "Temperature",
+  HUMIDITY: "Humidity",
+  PH: "pH",
+  EC: "EC",
+  CO2: "CO₂",
+  OTHER: "Other",
+};
