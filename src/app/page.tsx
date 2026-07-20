@@ -558,6 +558,17 @@ export default async function HomePage() {
           </nav>
           <p>© {new Date().getFullYear()} KhulaGrow · Cultivation software for licensed growers</p>
         </div>
+        <p className="mx-auto mt-6 max-w-6xl text-center text-xs text-gray-300 sm:text-right">
+          Developed by{" "}
+          <a
+            href="https://www.smartpick.co.za/it"
+            target="_blank"
+            rel="noopener"
+            className="font-medium text-gray-400 hover:text-brand-700"
+          >
+            SmartP1ck
+          </a>
+        </p>
       </footer>
     </div>
   );
