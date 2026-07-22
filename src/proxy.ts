@@ -16,6 +16,12 @@ const PUBLIC_PATHS = [
   // Generated favicon routes (also covers /icons/* and /apple-icon).
   "/icon",
   "/apple-icon",
+  // Public trust & compliance pages — must be reachable without a session.
+  "/privacy",
+  "/terms",
+  "/data",
+  "/security",
+  "/support",
 ];
 
 export async function proxy(req: NextRequest) {

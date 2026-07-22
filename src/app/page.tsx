@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
+import { TRUST_LINKS } from "@/components/LegalPage";
 
 const SITE_URL = process.env.APP_URL ?? "https://khulagrow.smartpick.co.za";
 
@@ -546,29 +547,65 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white px-4 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-gray-400 sm:flex-row">
-          <p className="flex items-center gap-2 font-semibold text-brand-800">
-            <span>🌱</span> KhulaGrow
-          </p>
-          <nav aria-label="Footer" className="flex gap-6">
-            <a href="#features" className="hover:text-brand-700">Features</a>
-            <a href="#pricing" className="hover:text-brand-700">Pricing</a>
-            <Link href="/login" className="hover:text-brand-700">Sign in</Link>
+      <footer className="border-t border-gray-100 bg-white px-4 py-12">
+        <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <p className="flex items-center gap-2 font-semibold text-brand-800">
+              <span>🌱</span> KhulaGrow
+            </p>
+            <p className="mt-2 max-w-xs text-sm text-gray-400">
+              Seed-to-harvest cultivation management and SAHPRA-ready records for licensed growers in
+              South Africa.
+            </p>
+          </div>
+
+          <nav aria-label="Product" className="text-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Product</p>
+            <ul className="mt-3 space-y-2 text-gray-500">
+              <li><a href="#features" className="hover:text-brand-700">Features</a></li>
+              <li><a href="#compliance" className="hover:text-brand-700">Compliance</a></li>
+              <li><a href="#pricing" className="hover:text-brand-700">Pricing</a></li>
+              <li><Link href="/login" className="hover:text-brand-700">Sign in</Link></li>
+            </ul>
           </nav>
-          <p>© {new Date().getFullYear()} KhulaGrow · Cultivation software for licensed growers</p>
+
+          <nav aria-label="Trust & compliance" className="text-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Trust &amp; compliance</p>
+            <ul className="mt-3 space-y-2 text-gray-500">
+              {TRUST_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="hover:text-brand-700">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Contact" className="text-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Contact</p>
+            <ul className="mt-3 space-y-2 text-gray-500">
+              <li>
+                <a href="mailto:support@smartpick.co.za" className="hover:text-brand-700">
+                  support@smartpick.co.za
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
-        <p className="mx-auto mt-6 max-w-6xl text-center text-xs text-gray-300 sm:text-right">
-          Developed by{" "}
-          <a
-            href="https://www.smartpick.co.za/it"
-            target="_blank"
-            rel="noopener"
-            className="font-medium text-gray-400 hover:text-brand-700"
-          >
-            SmartP1ck
-          </a>
-        </p>
+
+        <div className="mx-auto mt-10 flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-gray-100 pt-6 text-xs text-gray-400 sm:flex-row">
+          <p>© {new Date().getFullYear()} KhulaGrow · Cultivation software for licensed growers</p>
+          <p className="text-gray-300">
+            Developed by{" "}
+            <a
+              href="https://www.smartpick.co.za/it"
+              target="_blank"
+              rel="noopener"
+              className="font-medium text-gray-400 hover:text-brand-700"
+            >
+              SmartP1ck
+            </a>
+          </p>
+        </div>
       </footer>
     </div>
   );
