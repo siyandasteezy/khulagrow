@@ -10,9 +10,7 @@ import { prisma } from "./db";
  * subscription.
  */
 
-// ⚠️ TEMPORARY — lowered to Yoco's R2.00 minimum for a live payment test.
-// REVERT to 150_000 (R1,500.00) once the test is confirmed.
-export const PLAN_AMOUNT_CENTS = 200; // R2.00 — LIVE TEST ONLY
+export const PLAN_AMOUNT_CENTS = 150_000; // R1,500.00
 export const PLAN_CURRENCY = "ZAR";
 export const TRIAL_DAYS = 3;
 
