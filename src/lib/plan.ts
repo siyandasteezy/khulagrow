@@ -2,18 +2,20 @@
  * Plan facts, in one place, with no database import — safe for the public
  * marketing pages as well as the app.
  *
- * TRIAL_DAYS is deliberately env-driven: the marketing plan calls for a
- * sequential test of a longer trial (T-13). Set TRIAL_DAYS=14 in the
- * environment to run the long-trial cohort; every new registration records
- * the value it was given, so /admin/measurement can compare cohorts without
- * anyone having to remember when the switch was flipped.
+ * TRIAL_DAYS is the current trial policy, overridable per environment. The
+ * marketing plan calls for a sequential test of a longer trial (T-13): the
+ * 14-day cohort starts 31 August 2026, replacing the original 3-day trial.
+ * Every new registration records the value it was given, so
+ * /admin/measurement can compare cohorts without anyone having to remember
+ * when the switch was flipped. Set TRIAL_DAYS in the environment to override
+ * this default (e.g. to revert to 3 without a deploy).
  */
 
 export const PLAN_AMOUNT_CENTS = 150_000; // R1,500.00
 export const PLAN_CURRENCY = "ZAR";
 export const PLAN_PRICE_LABEL = "R1,500";
 
-const DEFAULT_TRIAL_DAYS = 3;
+const DEFAULT_TRIAL_DAYS = 14;
 
 function readTrialDays(): number {
   const raw = Number(process.env.TRIAL_DAYS);
