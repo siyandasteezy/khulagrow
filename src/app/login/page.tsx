@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Field, Input, Card } from "@/components/ui";
+import { AttributionCapture, storedAttribution } from "@/components/AttributionCapture";
+import { TRIAL_LABEL } from "@/lib/plan";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +24,7 @@ export default function LoginPage() {
         body: JSON.stringify(
           mode === "login"
             ? { email: form.email, password: form.password }
-            : form
+            : { ...form, attribution: storedAttribution() }
         ),
       });
       const data = await res.json();
@@ -41,6 +43,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-b from-brand-800 to-brand-900 px-4">
+      {/* Catches attribution for anyone who lands straight on /login. */}
+      <AttributionCapture />
       <div className="mb-8 text-center">
         <div className="text-5xl">🌱</div>
         <h1 className="mt-3 text-3xl font-bold text-white">KhulaGrow</h1>
@@ -103,6 +107,12 @@ export default function LoginPage() {
           <Button type="submit" size="lg" disabled={busy}>
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </Button>
+
+          {mode === "register" && (
+            <p className="text-center text-xs text-gray-400">
+              Your {TRIAL_LABEL} free trial starts straight away — no card required.
+            </p>
+          )}
         </form>
       </Card>
 

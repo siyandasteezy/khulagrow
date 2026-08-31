@@ -12,9 +12,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <p className="font-display flex items-center gap-2 font-semibold tracking-tight text-brand-800">
             <span>🌱</span> KhulaGrow <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-bold text-brand-800">Admin</span>
           </p>
-          <Link href="/dashboard" className="text-sm font-semibold text-brand-700 hover:text-brand-800">
-            Open app →
-          </Link>
+          <nav aria-label="Admin" className="flex items-center gap-5 text-sm font-semibold">
+            <Link href="/admin" className="text-gray-500 hover:text-brand-800">Registrations</Link>
+            <Link href="/admin/measurement" className="text-gray-500 hover:text-brand-800">Measurement</Link>
+            <Link href="/dashboard" className="text-brand-700 hover:text-brand-800">Open app →</Link>
+          </nav>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>

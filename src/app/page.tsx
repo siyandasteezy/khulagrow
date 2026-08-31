@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
-import { TRUST_LINKS } from "@/components/LegalPage";
+import { SiteFooter } from "@/components/PublicShell";
+import { Testimonials, CaseStudies, FieldGallery } from "@/components/Proof";
+import { AttributionCapture } from "@/components/AttributionCapture";
+import {
+  TRIAL_LABEL,
+  TRIAL_DAYS_LABEL,
+  PLAN_PRICE_LABEL,
+  PLAN_AMOUNT_CENTS,
+  PLAN_CURRENCY,
+} from "@/lib/plan";
+import { publishedResources } from "@/lib/resources";
 
 const SITE_URL = process.env.APP_URL ?? "https://khulagrow.smartpick.co.za";
 
+// Note: no `keywords` — the meta-keywords tag has had no ranking value for
+// years and search engines ignore it (tracker task T-02).
 export const metadata: Metadata = {
   title: "KhulaGrow — Cannabis Cultivation Management Software for South Africa",
   description:
-    "Seed-to-harvest traceability, SAHPRA-ready record-keeping, offline field capture, harvest & inventory tracking, and investor-ready reports for licensed cannabis cultivators in South Africa. R1,500/month, 3-day free trial.",
-  keywords: [
-    "cannabis cultivation software South Africa",
-    "SAHPRA compliance software",
-    "seed to harvest traceability",
-    "cannabis farm management",
-    "cannabis grow records",
-    "cultivation batch tracking",
-    "cannabis compliance records",
-    "hemp farm software",
-    "cannabis ERP South Africa",
-    "grow management app",
-  ],
+    `Seed-to-harvest traceability, SAHPRA-ready record-keeping, offline field capture, harvest & inventory tracking, and investor-ready reports for licensed cannabis cultivators in South Africa. ${PLAN_PRICE_LABEL}/month, ${TRIAL_LABEL} free trial.`,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
     siteName: "KhulaGrow",
     title: "KhulaGrow — Seed-to-Harvest Cannabis Cultivation Management",
     description:
-      "SAHPRA-ready traceability and farm management for licensed cannabis cultivators in South Africa. Capture data in the field, even offline. R1,500/month with a 3-day free trial.",
+      `SAHPRA-ready traceability and farm management for licensed cannabis cultivators in South Africa. Capture data in the field, even offline. ${PLAN_PRICE_LABEL}/month with a ${TRIAL_LABEL} free trial.`,
     locale: "en_ZA",
   },
   twitter: {
     card: "summary_large_image",
     title: "KhulaGrow — Cannabis Cultivation Management for South Africa",
     description:
-      "Seed-to-harvest traceability, SAHPRA compliance and farm dashboards for licensed cultivators. 3-day free trial.",
+      `Seed-to-harvest traceability, SAHPRA compliance and farm dashboards for licensed cultivators. ${TRIAL_LABEL} free trial.`,
   },
 };
 
@@ -83,7 +83,7 @@ const FAQS = [
   },
   {
     q: "How much does KhulaGrow cost?",
-    a: "R1,500 per month per farm owner, which covers the whole team — managers, supervisors, workers and inspectors included. Every new account starts with a 3-day free trial, no card required.",
+    a: `${PLAN_PRICE_LABEL} per month per farm owner, which covers the whole team — managers, supervisors, workers and inspectors included. Every new account starts with a ${TRIAL_LABEL} free trial, no card required.`,
   },
   {
     q: "How do payments work?",
@@ -103,6 +103,22 @@ function JsonLd() {
   const data = [
     {
       "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "KhulaGrow",
+      url: SITE_URL,
+      description:
+        "Cannabis cultivation management and SAHPRA-ready record-keeping software for licensed growers in South Africa.",
+      email: "support@smartpick.co.za",
+      areaServed: { "@type": "Country", name: "South Africa" },
+      knowsAbout: [
+        "SAHPRA cannabis cultivation licensing",
+        "Seed-to-harvest traceability",
+        "Cannabis cultivation record-keeping",
+      ],
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: "KhulaGrow",
       applicationCategory: "BusinessApplication",
@@ -110,11 +126,12 @@ function JsonLd() {
       description:
         "Seed-to-harvest cannabis cultivation management and SAHPRA-ready record-keeping for licensed cultivators in South Africa.",
       url: SITE_URL,
+      publisher: { "@id": `${SITE_URL}/#organization` },
       offers: {
         "@type": "Offer",
-        price: "1500",
-        priceCurrency: "ZAR",
-        description: "Monthly subscription per farm owner, 3-day free trial",
+        price: String(PLAN_AMOUNT_CENTS / 100),
+        priceCurrency: PLAN_CURRENCY,
+        description: `Monthly subscription per farm owner, ${TRIAL_LABEL} free trial`,
       },
     },
     {
@@ -283,10 +300,12 @@ export default async function HomePage() {
   const session = await getSession();
   const appHref = session ? "/dashboard" : "/login";
   const appCta = session ? "Open dashboard" : "Sign in";
+  const guides = publishedResources().slice(0, 3);
 
   return (
     <div className="bg-[#f6f7f4] text-gray-900">
       <JsonLd />
+      <AttributionCapture />
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur">
@@ -298,6 +317,7 @@ export default async function HomePage() {
             <a href="#features" className="hover:text-brand-700">Features</a>
             <a href="#compliance" className="hover:text-brand-700">Compliance</a>
             <a href="#pricing" className="hover:text-brand-700">Pricing</a>
+            <Link href="/resources" className="hover:text-brand-700">Guides</Link>
             <a href="#faq" className="hover:text-brand-700">FAQ</a>
           </nav>
           <Link
@@ -335,7 +355,7 @@ export default async function HomePage() {
                 href="/login"
                 className="w-full rounded-xl bg-white px-8 py-4 text-base font-bold text-brand-800 shadow-lg hover:bg-brand-50 sm:w-auto"
               >
-                Start your 3-day free trial
+                Start your {TRIAL_LABEL} free trial
               </Link>
               <a
                 href="#features"
@@ -345,7 +365,7 @@ export default async function HomePage() {
               </a>
             </div>
             <p className="mt-4 text-sm text-brand-200">
-              No card needed for the trial · R1,500/month · Covers your whole team
+              No card needed for the trial · {PLAN_PRICE_LABEL}/month · Covers your whole team
             </p>
           </div>
           <div className="hidden sm:block">
@@ -470,6 +490,11 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Real customer proof — each renders only once src/lib/proof.ts is filled in */}
+      <FieldGallery />
+      <Testimonials />
+      <CaseStudies />
+
       {/* Pricing */}
       <section id="pricing" className="bg-white px-4 py-20">
         <div className="mx-auto max-w-xl text-center">
@@ -481,9 +506,9 @@ export default async function HomePage() {
           </p>
           <div className="mt-10 rounded-3xl border border-brand-200 bg-white p-8 shadow-lg">
             <p className="font-display text-6xl font-semibold tracking-tight text-brand-800">
-              R1,500<span className="font-sans text-lg font-medium tracking-normal text-gray-400"> / month</span>
+              {PLAN_PRICE_LABEL}<span className="font-sans text-lg font-medium tracking-normal text-gray-400"> / month</span>
             </p>
-            <p className="mt-2 text-sm font-semibold text-brand-700">3-day free trial — no card required</p>
+            <p className="mt-2 text-sm font-semibold text-brand-700">{TRIAL_LABEL} free trial — no card required</p>
             <ul className="mx-auto mt-6 max-w-xs space-y-2.5 text-left text-sm text-gray-700">
               {[
                 "Unlimited farms, batches & plants",
@@ -528,6 +553,42 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Guides — internal links into the content engine */}
+      {guides.length > 0 && (
+        <section className="bg-white px-4 py-20">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="font-display text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+              Guides for <em className="italic text-brand-700">licensed growers</em>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-center text-gray-500">
+              Plain-language reading on licensing, inspections and the records that keep your
+              licence.
+            </p>
+            <div className="mt-10 grid gap-5 sm:grid-cols-3">
+              {guides.map((g) => (
+                <Link
+                  key={g.slug}
+                  href={`/resources/${g.slug}`}
+                  className="group rounded-2xl border border-gray-100 bg-[#f6f7f4] p-6 transition-shadow hover:shadow-md"
+                >
+                  <p className="text-xs font-bold uppercase tracking-wide text-brand-700">{g.category}</p>
+                  <h3 className="font-display mt-2 text-lg font-semibold leading-snug tracking-tight group-hover:text-brand-800">
+                    {g.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-gray-500">{g.description}</p>
+                  <p className="mt-4 text-xs font-semibold text-gray-400">{g.readingMinutes} min read →</p>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-8 text-center">
+              <Link href="/resources" className="font-semibold text-brand-700 hover:text-brand-800">
+                Browse the grower&apos;s library →
+              </Link>
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-800 to-brand-900 px-4 py-16 text-center text-white">
         <LeafTexture id="leaf-cta" className="absolute inset-0 text-white" />
@@ -536,7 +597,7 @@ export default async function HomePage() {
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-brand-100">
           Set up your farm, start your first batch and capture your first logs in under
-          ten minutes — free for 3 days.
+          ten minutes — free for {TRIAL_DAYS_LABEL}.
         </p>
         <Link
           href="/login"
@@ -546,67 +607,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white px-4 py-12">
-        <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="sm:col-span-2 lg:col-span-1">
-            <p className="flex items-center gap-2 font-semibold text-brand-800">
-              <span>🌱</span> KhulaGrow
-            </p>
-            <p className="mt-2 max-w-xs text-sm text-gray-400">
-              Seed-to-harvest cultivation management and SAHPRA-ready records for licensed growers in
-              South Africa.
-            </p>
-          </div>
-
-          <nav aria-label="Product" className="text-sm">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Product</p>
-            <ul className="mt-3 space-y-2 text-gray-500">
-              <li><a href="#features" className="hover:text-brand-700">Features</a></li>
-              <li><a href="#compliance" className="hover:text-brand-700">Compliance</a></li>
-              <li><a href="#pricing" className="hover:text-brand-700">Pricing</a></li>
-              <li><Link href="/login" className="hover:text-brand-700">Sign in</Link></li>
-            </ul>
-          </nav>
-
-          <nav aria-label="Trust & compliance" className="text-sm">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Trust &amp; compliance</p>
-            <ul className="mt-3 space-y-2 text-gray-500">
-              {TRUST_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="hover:text-brand-700">{l.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="Contact" className="text-sm">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Contact</p>
-            <ul className="mt-3 space-y-2 text-gray-500">
-              <li>
-                <a href="mailto:support@smartpick.co.za" className="hover:text-brand-700">
-                  support@smartpick.co.za
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        <div className="mx-auto mt-10 flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-gray-100 pt-6 text-xs text-gray-400 sm:flex-row">
-          <p>© {new Date().getFullYear()} KhulaGrow · Cultivation software for licensed growers</p>
-          <p className="text-gray-300">
-            Developed by{" "}
-            <a
-              href="https://www.smartpick.co.za/it"
-              target="_blank"
-              rel="noopener"
-              className="font-medium text-gray-400 hover:text-brand-700"
-            >
-              SmartP1ck
-            </a>
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

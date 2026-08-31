@@ -1,18 +1,18 @@
 import crypto from "crypto";
 import { addDays, addMonths } from "date-fns";
 import { prisma } from "./db";
+import { PLAN_AMOUNT_CENTS, PLAN_CURRENCY, TRIAL_DAYS } from "./plan";
 
 /**
- * Billing: R1,500/month per farm owner, 3-day free trial at registration.
+ * Billing: R1,500/month per farm owner, free trial at registration
+ * (length from TRIAL_DAYS in src/lib/plan.ts).
  * Payments run through Yoco Checkout (one-time payments — Yoco's public
  * API has no auto-recurring debit, so renewal is a one-tap manual payment
  * from the billing page). Team members are covered by their farm owner's
  * subscription.
  */
 
-export const PLAN_AMOUNT_CENTS = 150_000; // R1,500.00
-export const PLAN_CURRENCY = "ZAR";
-export const TRIAL_DAYS = 3;
+export { PLAN_AMOUNT_CENTS, PLAN_CURRENCY, TRIAL_DAYS };
 
 const YOCO_API = "https://payments.yoco.com/api";
 

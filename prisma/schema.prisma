@@ -31,10 +31,21 @@ model User {
   // Platform admin: sees /admin (all registrations, billing status).
   isAdmin      Boolean      @default(false)
   createdAt    DateTime     @default(now())
-  // Billing: 3-day trial starts at registration; each Yoco payment
+  // Billing: the free trial starts at registration; each Yoco payment
   // extends subscriptionEndsAt by one month.
   trialEndsAt        DateTime?
   subscriptionEndsAt DateTime?
+  // Trial length this account was actually given, in days. Recorded at
+  // registration so the trial-length test (3 vs 14 days) can be measured
+  // per cohort long after TRIAL_DAYS has been changed again.
+  trialDays          Int?
+  // Acquisition attribution, captured from the landing URL at registration.
+  // Drives the named-account and partnership-sourced KPIs in /admin/measurement.
+  signupSource       String?
+  signupMedium       String?
+  signupCampaign     String?
+  signupReferrer     String?
+  signupLandingPath  String?
   memberships  FarmMember[]
   tasks        TaskItem[]   @relation("assignee")
   auditLogs    AuditLog[]

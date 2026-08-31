@@ -16,6 +16,8 @@ const PUBLIC_PATHS = [
   // Generated favicon routes (also covers /icons/* and /apple-icon).
   "/icon",
   "/apple-icon",
+  // The grower's library — the whole point is that it's public.
+  "/resources",
   // Public trust & compliance pages — must be reachable without a session.
   "/privacy",
   "/terms",
