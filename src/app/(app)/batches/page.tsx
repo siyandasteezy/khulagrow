@@ -63,7 +63,7 @@ export default function BatchesPage() {
               <Card className="active:scale-[0.99] transition-transform">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-bold text-gray-900">{b.code}</p>
+                    <p className="font-data font-bold text-gray-900">{b.code}</p>
                     <p className="text-sm text-gray-500">
                       {b.strain.name} · {b.plantCount} plants
                       {b.area ? ` · ${b.area.name}` : ""}

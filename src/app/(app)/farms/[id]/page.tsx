@@ -146,7 +146,7 @@ export default function FarmDetailPage({ params }: { params: Promise<{ id: strin
           <span className="text-gray-500">Size</span>
           <span className="font-medium">{farm.sizeHectares ? `${farm.sizeHectares} ha` : "—"}</span>
           <span className="text-gray-500">GPS</span>
-          <span className="font-medium">
+          <span className="font-data font-medium">
             {farm.latitude ? `${farm.latitude.toFixed(5)}, ${farm.longitude?.toFixed(5)}` : "—"}
           </span>
           <span className="text-gray-500">Records</span>
@@ -295,11 +295,11 @@ export default function FarmDetailPage({ params }: { params: Promise<{ id: strin
             </p>
             <div className="rounded-xl bg-gray-50 p-3.5 text-xs">
               <p className="font-semibold text-gray-500">Endpoint</p>
-              <p className="mt-0.5 break-all font-mono">{`POST ${window.location.origin}/api/ingest`}</p>
+              <p className="mt-0.5 break-all font-data">{`POST ${window.location.origin}/api/ingest`}</p>
               <p className="mt-3 font-semibold text-gray-500">API key (Authorization: Bearer …)</p>
-              <p className="mt-0.5 break-all font-mono">{newKey.apiKey}</p>
+              <p className="mt-0.5 break-all font-data">{newKey.apiKey}</p>
               <p className="mt-3 font-semibold text-gray-500">Example</p>
-              <pre className="mt-0.5 overflow-x-auto whitespace-pre-wrap break-all font-mono text-[10px] leading-relaxed">{`curl -X POST ${window.location.origin}/api/ingest \\
+              <pre className="mt-0.5 overflow-x-auto whitespace-pre-wrap break-all font-data text-[10px] leading-relaxed">{`curl -X POST ${window.location.origin}/api/ingest \\
   -H "Authorization: Bearer ${newKey.apiKey}" \\
   -H "Content-Type: application/json" \\
   -d '{"tempC": 24.5, "humidity": 61}'`}</pre>
@@ -319,7 +319,7 @@ export default function FarmDetailPage({ params }: { params: Promise<{ id: strin
           <div className="space-y-4">
             <div className="rounded-xl bg-gray-50 p-3.5 text-xs">
               <p className="font-semibold text-gray-500">API key</p>
-              <p className="mt-0.5 break-all font-mono">{manageSensor.apiKey}</p>
+              <p className="mt-0.5 break-all font-data">{manageSensor.apiKey}</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Button variant="secondary" onClick={() => copyKey(manageSensor.apiKey)}>

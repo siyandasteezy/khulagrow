@@ -3,6 +3,9 @@
 /* inline: the utility must inline var(--font-fraunces), which next/font sets on <body> */
 @theme inline {
   --font-display: var(--font-fraunces), Georgia, serif;
+  /* Data-shaped values — batch codes, timestamps, GPS, prices — per the
+     field plan's type pairing (Design System, p.6). Use font-data. */
+  --font-data: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @theme {

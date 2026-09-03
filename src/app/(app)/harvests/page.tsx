@@ -40,7 +40,7 @@ export default function HarvestsPage() {
             <Card key={h.id}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-bold text-gray-900">{h.batch.code}</p>
+                  <p className="font-data font-bold text-gray-900">{h.batch.code}</p>
                   <p className="text-sm text-gray-500">{h.batch.strain.name} · {h.plantCount} plants</p>
                 </div>
                 <span className="text-xs text-gray-400">{format(new Date(h.date), "d MMM yyyy")}</span>
@@ -55,7 +55,7 @@ export default function HarvestsPage() {
               {h.lots.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {h.lots.map((l) => (
-                    <Badge key={l.id} className="bg-blue-50 text-blue-800 font-mono">
+                    <Badge key={l.id} className="bg-blue-50 text-blue-800 font-data">
                       {l.code} · {LOT_STATUS_LABELS[l.status]}
                     </Badge>
                   ))}

@@ -248,7 +248,7 @@ function PhoneMock() {
       </div>
       {/* floating cards */}
       <div className="absolute -left-24 top-40 hidden -rotate-6 rounded-2xl bg-white px-3.5 py-2.5 shadow-xl sm:block">
-        <p className="text-[10px] font-bold text-gray-900">🌿 KG-2026-002</p>
+        <p className="font-data text-[10px] font-bold text-gray-900">🌿 KG-2026-002</p>
         <p className="text-[9px] text-gray-500">Flowering · day 34 · 96 plants</p>
       </div>
       <div className="absolute -right-20 bottom-16 hidden rotate-3 rounded-2xl bg-white px-3.5 py-2.5 shadow-xl sm:block">
@@ -476,11 +476,11 @@ export default async function HomePage() {
             <div className="relative rounded-2xl bg-white p-5 shadow-lg">
               <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Destruction record — example</p>
               <div className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-gray-500">Batch</span><span className="font-mono font-semibold">KG-2026-002</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Batch</span><span className="font-data font-semibold">KG-2026-002</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">Reason</span><span className="font-semibold">Male plants (6)</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">Method</span><span className="font-semibold">Shredded &amp; composted</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">Witness</span><span className="font-semibold">T. Nkosi</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Logged by</span><span className="font-semibold">S. Dlamini · 09:14</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Logged by</span><span className="font-semibold">S. Dlamini · <span className="font-data">09:14</span></span></div>
               </div>
               <p className="mt-4 rounded-lg bg-brand-50 px-3 py-2 text-xs font-medium text-brand-800">
                 ✓ Recorded in the audit trail — exportable in your compliance pack

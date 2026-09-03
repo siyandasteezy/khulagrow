@@ -214,7 +214,7 @@ export default function DashboardPage() {
                     <div className="h-2.5 flex-1 rounded-full bg-gray-100">
                       <div className="h-full rounded-full bg-brand-500" style={{ width: `${(c.costRands / max) * 100}%` }} />
                     </div>
-                    <span className="w-24 shrink-0 text-right font-medium">{fmtRands(c.costRands)}</span>
+                    <span className="w-24 shrink-0 text-right font-data font-medium">{fmtRands(c.costRands)}</span>
                   </div>
                 );
               })}
@@ -232,10 +232,10 @@ export default function DashboardPage() {
             {data.recentEvents.map((e) => (
               <li key={e.id} className="flex items-start justify-between gap-2 py-2 text-sm">
                 <div>
-                  <span className="font-medium text-gray-800">{e.batchCode}</span>{" "}
+                  <span className="font-data font-medium text-gray-800">{e.batchCode}</span>{" "}
                   <span className="text-gray-500">{e.note ?? e.type}</span>
                 </div>
-                <span className="shrink-0 text-xs text-gray-400">{format(new Date(e.at), "d MMM HH:mm")}</span>
+                <span className="font-data shrink-0 text-xs text-gray-400">{format(new Date(e.at), "d MMM HH:mm")}</span>
               </li>
             ))}
           </ul>

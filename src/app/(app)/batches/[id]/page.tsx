@@ -211,7 +211,7 @@ export default function BatchDetailPage({ params }: { params: Promise<{ id: stri
           <h3 className="mb-2 text-sm font-bold text-gray-700">Tagged plants ({batch.plants.length})</h3>
           <div className="flex max-h-56 flex-wrap gap-1.5 overflow-y-auto">
             {batch.plants.map((p) => (
-              <Badge key={p.id} className={cn("font-mono", p.stage === "DESTROYED" ? "bg-red-50 text-red-400 line-through" : HEALTH_COLORS[p.health])}>
+              <Badge key={p.id} className={cn("font-data", p.stage === "DESTROYED" ? "bg-red-50 text-red-400 line-through" : HEALTH_COLORS[p.health])}>
                 {p.tag.split("-").pop()}
               </Badge>
             ))}

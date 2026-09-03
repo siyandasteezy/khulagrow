@@ -75,7 +75,7 @@ export default function InventoryPage() {
             <Card key={l.id} onClick={() => setSelected(l)}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-sm font-bold text-gray-900">{l.code}</p>
+                  <p className="font-data text-sm font-bold text-gray-900">{l.code}</p>
                   <p className="text-sm text-gray-500">
                     {PRODUCT_LABELS[l.product]} · {fmtGrams(l.weightGrams)}
                     {l.harvest ? ` · ${l.harvest.batch.strain.name}` : ""}
