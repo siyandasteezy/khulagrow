@@ -2,6 +2,7 @@ import { differenceInDays, format, subDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { channelOf, type Channel } from "@/lib/attribution";
 import { TRIAL_DAYS } from "@/lib/plan";
+import { KEYWORD_TARGETS, KEYWORD_TIER_ORDER, keywordStatus } from "@/lib/keywords";
 
 export const dynamic = "force-dynamic";
 
@@ -211,6 +212,19 @@ export default async function MeasurementPage() {
             r.converted ? `Paid (day ${r.daysToPay})` : r.activated ? "Activated" : r.trialOver ? "Lapsed" : "On trial",
           ])}
           empty="No registrations yet."
+        />
+      </Panel>
+
+      <Panel
+        title="Keyword targets"
+        note="The clusters from the field plan's SEO strategy, ranked by where a prospect sits in the 12–24 month licensing journey, not by search volume. Live SERP position isn't tracked here yet — that needs a Google Search Console property for khulagrow.smartpick.co.za verified in your Google account, with API access granted to this app. That verification is a your-end step; ping me once it's done and I'll wire the ranks in."
+      >
+        <Table
+          head={["Term", "Tier", "Intent", "Guide"]}
+          rows={[...KEYWORD_TARGETS]
+            .sort((a, b) => KEYWORD_TIER_ORDER.indexOf(a.tier) - KEYWORD_TIER_ORDER.indexOf(b.tier))
+            .map((k) => [k.term, k.tier, k.intent, keywordStatus(k)])}
+          empty="No keyword targets defined."
         />
       </Panel>
     </div>
